@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Modern Task Dashboard V1</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3B82F6", // Vibrant muted blue
+              "primary-soft": "#DBEAFE", // Very light blue for cards
+              "background-light": "#F8FAFC", // Off-white
+              "background-dark": "#0F172A", // Deep slate
+              "card-light": "#FFFFFF",
+              "card-dark": "#1E293B",
+              "text-main-light": "#1E293B",
+              "text-main-dark": "#F1F5F9",
+              "text-sub-light": "#64748B",
+              "text-sub-dark": "#94A3B8",
+              "accent-delete": "#FF6B6B", // Soft red as requested
+            },
+            fontFamily: {
+              display: ["Outfit", "sans-serif"],
+              sans: ["Outfit", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "1rem",
+              'xl': '1.5rem',
+              '2xl': '2rem',
+            },
+            boxShadow: {
+                'soft': '0 10px 40px -10px rgba(0,0,0,0.05)',
+                'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+                'glow': '0 0 15px rgba(59, 130, 246, 0.5)',
+            },
+            animation: {
+                'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            }
+          },
+        },
+      };
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .dark .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .custom-checkbox input:checked + div {
+            background-color: #3B82F6;
+            border-color: #3B82F6;
+        }
+        .custom-checkbox input:checked + div svg {
+            display: block;
+        }
+    </style>
+<style>
+        body {
+          min-height: max(884px, 100dvh);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-sans antialiased min-h-screen flex flex-col transition-colors duration-300 relative overflow-hidden">
+<div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+<div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-blue-200 dark:bg-blue-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-30 animate-pulse-slow"></div>
+<div class="absolute top-[20%] left-[-10%] w-72 h-72 bg-purple-200 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-30 delay-1000 animate-pulse-slow"></div>
+<div class="absolute bottom-[-10%] right-[20%] w-80 h-80 bg-indigo-200 dark:bg-indigo-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-30 delay-700 animate-pulse-slow"></div>
+</div>
+<div class="relative z-10 flex flex-col h-full max-w-md mx-auto w-full p-6 pt-12 flex-grow">
+<header class="mb-8">
+<h1 class="text-4xl font-bold text-text-main-light dark:text-text-main-dark tracking-tight mb-1">Tasks</h1>
+<p class="text-text-sub-light dark:text-text-sub-dark font-medium text-lg">Monday, October 24</p>
+</header>
+<nav class="flex space-x-3 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+<button class="px-6 py-2.5 bg-primary text-white rounded-full text-sm font-semibold shadow-glow transition-transform active:scale-95 whitespace-nowrap">
+                All
+            </button>
+<button class="px-6 py-2.5 bg-white dark:bg-card-dark text-text-sub-light dark:text-text-sub-dark rounded-full text-sm font-semibold shadow-soft hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors whitespace-nowrap">
+                To-Do
+            </button>
+<button class="px-6 py-2.5 bg-white dark:bg-card-dark text-text-sub-light dark:text-text-sub-dark rounded-full text-sm font-semibold shadow-soft hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors whitespace-nowrap">
+                Done
+            </button>
+</nav>
+<main class="flex-grow space-y-3 pb-32">
+<div class="group relative overflow-hidden rounded-2xl bg-white dark:bg-card-dark shadow-soft transition-all hover:shadow-lg dark:hover:bg-slate-800/80">
+<div class="px-4 py-2.5 flex items-center space-x-4 bg-white dark:bg-card-dark relative z-10">
+<label class="custom-checkbox cursor-pointer relative flex items-center">
+<input class="sr-only" type="checkbox"/>
+<div class="w-5 h-5 border-2 border-primary-soft dark:border-slate-600 rounded-lg flex items-center justify-center transition-colors">
+<svg class="w-3.5 h-3.5 text-white hidden pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path></svg>
+</div>
+</label>
+<div class="flex-grow">
+<h3 class="text-text-main-light dark:text-text-main-dark font-medium text-base">Task 1</h3>
+</div>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-2xl shadow-soft transition-all bg-accent-delete">
+<div class="absolute right-0 top-0 h-full w-[100px] flex flex-row items-center justify-center space-x-1 pr-4 z-0 bg-accent-delete rounded-r-2xl">
+<span class="material-symbols-outlined text-white text-xl">delete</span>
+<span class="text-white text-sm font-medium tracking-wide">Delete</span>
+</div>
+<div class="px-4 py-2.5 flex items-center space-x-4 bg-white dark:bg-card-dark relative z-10 transition-transform -translate-x-[100px] rounded-r-2xl shadow-lg border-r border-gray-100 dark:border-slate-700 h-full">
+<label class="custom-checkbox cursor-pointer relative flex items-center">
+<input class="sr-only" type="checkbox"/>
+<div class="w-5 h-5 border-2 border-primary-soft dark:border-slate-600 rounded-lg flex items-center justify-center transition-colors">
+<svg class="w-3.5 h-3.5 text-white hidden pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path></svg>
+</div>
+</label>
+<div class="flex-grow">
+<h3 class="text-text-main-light dark:text-text-main-dark font-medium text-base">Task 2</h3>
+</div>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-2xl bg-blue-50/50 dark:bg-slate-800/30 shadow-sm transition-all">
+<div class="px-4 py-2.5 flex items-center space-x-4 relative z-10">
+<label class="custom-checkbox cursor-pointer relative flex items-center">
+<input checked="" class="sr-only" type="checkbox"/>
+<div class="w-5 h-5 border-2 border-primary rounded-lg flex items-center justify-center bg-primary transition-colors">
+<svg class="w-3.5 h-3.5 text-white pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path></svg>
+</div>
+</label>
+<div class="flex-grow opacity-50">
+<h3 class="text-text-main-light dark:text-text-main-dark font-medium text-base line-through decoration-slate-400">Task 3</h3>
+</div>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-2xl bg-white dark:bg-card-dark shadow-soft transition-all hover:shadow-lg dark:hover:bg-slate-800/80">
+<div class="px-4 py-2.5 flex items-center space-x-4 bg-white dark:bg-card-dark relative z-10">
+<label class="custom-checkbox cursor-pointer relative flex items-center">
+<input class="sr-only" type="checkbox"/>
+<div class="w-5 h-5 border-2 border-primary-soft dark:border-slate-600 rounded-lg flex items-center justify-center transition-colors">
+<svg class="w-3.5 h-3.5 text-white hidden pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path></svg>
+</div>
+</label>
+<div class="flex-grow">
+<h3 class="text-text-main-light dark:text-text-main-dark font-medium text-base">Task 4</h3>
+</div>
+</div>
+</div>
+</main>
+</div>
+<div class="fixed bottom-0 left-0 w-full z-50 p-6 pointer-events-none">
+<div class="max-w-md mx-auto pointer-events-auto">
+<div class="glass-panel p-2 rounded-2xl shadow-glass flex items-center space-x-3 pr-2">
+<div class="flex-grow relative">
+<span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-sub-light dark:text-text-sub-dark">
+<span class="material-symbols-outlined text-xl">add</span>
+</span>
+<input class="w-full bg-transparent border-none text-text-main-light dark:text-text-main-dark placeholder-text-sub-light dark:placeholder-text-sub-dark pl-12 pr-4 py-4 focus:ring-0 text-base font-medium" placeholder="Add a new task..." type="text"/>
+</div>
+<button class="h-12 w-12 bg-primary rounded-xl flex items-center justify-center text-white shadow-glow hover:scale-105 active:scale-95 transition-transform group">
+<span class="material-symbols-outlined text-2xl group-hover:rotate-90 transition-transform duration-300">arrow_upward</span>
+</button>
+</div>
+</div>
+</div>
+
+</body></html>

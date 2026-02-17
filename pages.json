@@ -1,0 +1,20 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "Tasks",
+				"navigationStyle": "custom"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "Clean Task",
+		"navigationBarBackgroundColor": "#F8FAFC",
+		"backgroundColor": "#F8FAFC",
+		"navigationBarTitleIcon": "",
+		"navigationBarTitleIconWidth": "0px"
+	}
+}
+

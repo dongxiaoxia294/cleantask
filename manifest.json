@@ -1,0 +1,72 @@
+{
+    "name" : "Clean Task",
+    "appid" : "__UNI__300C0B1", // 你自己的AppID（HBuilder X新建项目时自动生成）
+    "description" : "The simplest to-do list. No ads, no subscriptions, one time purchase.",
+    "versionName" : "1.0.0",
+    "versionCode" : "100",
+    "transformPx" : false,
+    "app-plus" : {
+        "name" : "Clean Task",
+        "appid" : "", // 安卓包名，格式如：com.cleantask.minimal（必须唯一）
+        "versionName" : "1.0.0",
+        "versionCode" : "100",
+        "icon" : "static/logo.png", // 可先忽略，上架时再配logo
+        "launchWebview" : {
+            "transparentTitle" : "none",
+            "titleNView" : false
+        },
+        "android" : {
+            "package" : "com.cleantask.minimal", // 同上，安卓包名
+            "minSdkVersion" : "21", // 最低安卓版本，21兼容99%设备
+            "targetSdkVersion" : "33",
+            "usesPermissions" : [
+                "android.permission.WRITE_EXTERNAL_STORAGE",
+                "android.permission.READ_EXTERNAL_STORAGE"
+            ]
+        },
+        "ios" : {
+            "bundleId" : "", // 未来做iOS时填，现在留空
+            "minVersion" : "11.0"
+        },
+        "distribute" : {
+            "icons" : {
+                "android" : {
+                    "hdpi" : "unpackage/res/icons/72x72.png",
+                    "xhdpi" : "unpackage/res/icons/96x96.png",
+                    "xxhdpi" : "unpackage/res/icons/144x144.png",
+                    "xxxhdpi" : "unpackage/res/icons/192x192.png"
+                },
+                "ios" : {
+                    "appstore" : "unpackage/res/icons/1024x1024.png",
+                    "ipad" : {
+                        "app" : "unpackage/res/icons/76x76.png",
+                        "app@2x" : "unpackage/res/icons/152x152.png",
+                        "notification" : "unpackage/res/icons/20x20.png",
+                        "notification@2x" : "unpackage/res/icons/40x40.png",
+                        "proapp@2x" : "unpackage/res/icons/167x167.png",
+                        "settings" : "unpackage/res/icons/29x29.png",
+                        "settings@2x" : "unpackage/res/icons/58x58.png",
+                        "spotlight" : "unpackage/res/icons/40x40.png",
+                        "spotlight@2x" : "unpackage/res/icons/80x80.png"
+                    },
+                    "iphone" : {
+                        "app@2x" : "unpackage/res/icons/120x120.png",
+                        "app@3x" : "unpackage/res/icons/180x180.png",
+                        "notification@2x" : "unpackage/res/icons/40x40.png",
+                        "notification@3x" : "unpackage/res/icons/60x60.png",
+                        "settings@2x" : "unpackage/res/icons/58x58.png",
+                        "settings@3x" : "unpackage/res/icons/87x87.png",
+                        "spotlight@2x" : "unpackage/res/icons/80x80.png",
+                        "spotlight@3x" : "unpackage/res/icons/120x120.png"
+                    }
+                }
+            },
+            "android" : {
+                "abiFilters" : [ "arm64-v8a", "x86" ]
+            },
+            "ios" : {
+                "dSYMs" : false
+            }
+        }
+    }
+}

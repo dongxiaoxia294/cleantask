@@ -1,9 +1,10 @@
 <template>
-	<view class="container">
+	<view :class="['container', theme === 'dark' ? 'dark' : '']">
 		<!-- Background Blobs (Simplified for Mobile) -->
 		<view class="blob-container">
 			<view class="blob blob-1"></view>
 			<view class="blob blob-2"></view>
+			<view class="blob blob-3"></view>
 		</view>
 
 		<!-- Status Bar Height -->
@@ -109,7 +110,8 @@ export default {
 			startX: 0,
 			startY: 0,
 			currentDate: '',
-			statusBarHeight: 0
+			statusBarHeight: 0,
+			theme: 'light'
 		}
 	},
 	computed: {
@@ -122,11 +124,145 @@ export default {
 	onLoad() {
 		this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 20;
 		this.loadTasks();
+		// Set initial theme
+		const res = uni.getSystemInfoSync();
+		this.theme = res.osTheme || res.theme || 'light';
+		
+		// 延迟执行导航栏颜色设置，确保 Activity 已准备好
+		setTimeout(() => {
+			this.syncNavigationBarColor();
+		}, 300);
+		
+		setTimeout(() => {
+			this.syncNavigationBarColor();
+		}, 1000);
+		
+		// Listen to theme change
+		if (typeof uni.onThemeChange === 'function') {
+			uni.onThemeChange((res) => {
+				this.theme = res.theme;
+				this.syncNavigationBarColor();
+			});
+		}
 	},
 	onShow() {
 		this.formatDate();
+		const res = uni.getSystemInfoSync();
+		this.theme = res.osTheme || res.theme || 'light';
+		
+		// 延迟同步导航栏颜色
+		setTimeout(() => {
+			this.syncNavigationBarColor();
+		}, 100);
+		
+		setTimeout(() => {
+			this.syncNavigationBarColor();
+		}, 500);
 	},
 	methods: {
+		syncNavigationBarColor() {
+			console.log('=== syncNavigationBarColor called ===');
+			
+			const systemInfo = uni.getSystemInfoSync();
+			const platform = systemInfo.platform;
+			console.log('Platform from uni:', platform);
+			
+			if (platform !== 'android' && platform !== 'app') {
+				console.log('Not Android App, skipping. Platform:', platform);
+				return;
+			}
+			
+			if (typeof plus === 'undefined') {
+				console.log('plus is undefined');
+				return;
+			}
+			
+			const isDark = this.theme === 'dark';
+			// 浅色模式使用渐变结束色，与页面背景融为一体
+			const navColor = isDark ? '#000000' : '#EFF6FF';
+			console.log('Setting navigation bar color:', navColor, 'isDark:', isDark);
+			
+			// 使用更可靠的方式调用 Android API
+			try {
+				// 获取主 Activity
+				const main = plus.android.runtimeMainActivity();
+				if (!main) {
+					console.error('Main activity is null');
+					return;
+				}
+				
+				// 获取 Window
+				const window = plus.android.invoke(main, 'getWindow');
+				if (!window) {
+					console.error('Window is null');
+					return;
+				}
+				
+				console.log('Got window successfully');
+				
+				// 设置导航栏颜色
+				try {
+					const Color = plus.android.importClass('android.graphics.Color');
+					const colorInt = Color.parseColor(navColor);
+					
+					plus.android.invoke(window, 'setNavigationBarColor', colorInt);
+					console.log('Set navigation bar color to:', navColor);
+					
+					// 再次设置确保生效
+					setTimeout(() => {
+						try {
+							plus.android.invoke(window, 'setNavigationBarColor', colorInt);
+							console.log('Set navigation bar color again');
+						} catch (e) {
+							console.log('Second set failed:', e.message);
+						}
+					}, 100);
+				} catch (navErr) {
+					console.error('Setting nav color failed:', navErr.message);
+				}
+				
+				// 设置 Window flags
+				try {
+					// 清除 FLAG_TRANSLUCENT_NAVIGATION
+					plus.android.invoke(window, 'clearFlags', 134217728);
+					console.log('Cleared FLAG_TRANSLUCENT_NAVIGATION');
+					
+					// 添加 FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS
+					plus.android.invoke(window, 'addFlags', -2147483648);
+					console.log('Added FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS');
+				} catch (flagsErr) {
+					console.error('Setting flags failed:', flagsErr.message);
+				}
+				
+				// 设置按钮颜色
+				try {
+					const decorView = plus.android.invoke(window, 'getDecorView');
+					if (decorView) {
+						const currentFlags = plus.android.invoke(decorView, 'getSystemUiVisibility');
+						
+						// SYSTEM_UI_FLAG_LAYOUT_STABLE = 256
+						let newFlags = currentFlags | 256;
+						
+						// SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR = 16 (浅色模式下按钮变深色)
+						if (!isDark) {
+							newFlags |= 16;
+						} else {
+							newFlags &= ~16;
+						}
+						
+						plus.android.invoke(decorView, 'setSystemUiVisibility', newFlags);
+						console.log('System UI flags set:', newFlags);
+					}
+				} catch (btnErr) {
+					console.error('Setting button color failed:', btnErr.message);
+				}
+				
+				console.log('=== syncNavigationBarColor completed ===');
+				
+			} catch (e) {
+				console.error('Native API failed:', e);
+			}
+		},
 		formatDate() {
 			const options = { weekday: 'long', month: 'long', day: 'numeric' };
 			this.currentDate = new Date().toLocaleDateString('en-US', options);
@@ -188,10 +324,13 @@ export default {
 
 <style scoped>
 .container {
-	position: relative;
+	position: fixed;
+	top: 0;
+	left: 0;
 	width: 100%;
-	height: 100vh;
+	height: 100%;
 	overflow: hidden;
+	background: linear-gradient(to bottom, var(--background-gradient-start), var(--background-gradient-end));
 }
 
 /* Background Blobs */
@@ -208,21 +347,28 @@ export default {
 	position: absolute;
 	border-radius: 50%;
 	filter: blur(60px);
-	opacity: 0.15;
+	opacity: var(--blob-opacity);
 }
 .blob-1 {
 	top: -10%;
 	right: -10%;
-	width: 400rpx;
-	height: 400rpx;
-	background-color: #3B82F6;
+	width: 500rpx;
+	height: 500rpx;
+	background-color: var(--blob-1-color);
 }
 .blob-2 {
-	top: 20%;
-	left: -10%;
+	bottom: -10%;
+	left: -20%;
+	width: 600rpx;
+	height: 600rpx;
+	background-color: var(--blob-2-color);
+}
+.blob-3 {
+	top: 40%;
+	left: 20%;
 	width: 300rpx;
 	height: 300rpx;
-	background-color: #A855F7;
+	background-color: var(--blob-3-color);
 }
 
 .status-bar {
@@ -236,7 +382,7 @@ export default {
 	padding: 40rpx;
 	display: flex;
 	flex-direction: column;
-	height: calc(100vh - var(--status-bar-height));
+	height: calc(100dvh - var(--status-bar-height));
 }
 
 /* Header */
@@ -284,6 +430,7 @@ export default {
 .task-list {
 	flex: 1;
 	height: 0; /* Force scroll-view to take flex space correctly */
+	padding-bottom: env(safe-area-inset-bottom);
 }
 .empty-state {
 	text-align: center;
@@ -422,13 +569,15 @@ export default {
 	left: 0;
 	width: 100%;
 	padding: 40rpx;
+	padding-bottom: calc(40rpx + constant(safe-area-inset-bottom));
+	padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
 	z-index: 100;
 }
 
 .glass-panel {
-	background: rgba(255, 255, 255, 0.7);
+	background: var(--glass-bg);
 	backdrop-filter: blur(12px);
-	border: 1px solid rgba(255, 255, 255, 0.5);
+	border: 1px solid var(--glass-border);
 	border-radius: 60rpx; /* Increased for rounder look */
 	padding: 16rpx;
 	display: flex;
@@ -496,32 +645,69 @@ export default {
 
 /* Dark Mode Overrides */
 @media (prefers-color-scheme: dark) {
-	.glass-panel {
-		background: rgba(30, 41, 59, 0.7);
-		border: 1px solid rgba(255, 255, 255, 0.1);
-	}
 	.send-btn-disabled {
-		background-color: #334155;
+		background-color: #2C2C2E;
 	}
 	.send-btn-disabled .arrow-icon {
-		color: #475569;
-	}
-	.checkbox {
-		border-color: #334155;
-	}
-	.tab-btn {
-		background-color: #1E293B;
-		box-shadow: none;
-	}
-	.task-card {
-		box-shadow: none;
-		background-color: #1E293B;
+		color: #48484A;
 	}
 	.task-done {
 		background-color: rgba(59, 130, 246, 0.1);
 	}
-	.blob-1 { opacity: 0.2; }
-	.blob-2 { opacity: 0.2; }
+	.tab-btn {
+		box-shadow: none;
+		background-color: #1C1C1E;
+		border: 1px solid rgba(255, 255, 255, 0.05);
+		backdrop-filter: blur(8px);
+	}
+	.tab-btn-active {
+		background-color: var(--primary);
+		color: #FFFFFF;
+		box-shadow: 0 8rpx 24rpx rgba(59, 130, 246, 0.4);
+	}
+	.placeholder {
+		color: #636366;
+	}
+	.blob-1 { opacity: 0.05; }
+	.blob-2 { opacity: 0.05; }
+	.blob-3 { opacity: 0.05; }
+	.task-card {
+		box-shadow: none;
+		background-color: #1C1C1E;
+		border: 1px solid rgba(255, 255, 255, 0.03);
+	}
+}
+
+.dark.container .send-btn-disabled {
+	background-color: #2C2C2E;
+}
+.dark.container .send-btn-disabled .arrow-icon {
+	color: #48484A;
+}
+.dark.container .task-done {
+	background-color: rgba(59, 130, 246, 0.1);
+}
+.dark.container .tab-btn {
+	box-shadow: none;
+	background-color: #1C1C1E;
+	border: 1px solid rgba(255, 255, 255, 0.05);
+	backdrop-filter: blur(8px);
+}
+.dark.container .tab-btn-active {
+	background-color: var(--primary);
+	color: #FFFFFF;
+	box-shadow: 0 8rpx 24rpx rgba(59, 130, 246, 0.4);
+}
+.dark.container .placeholder {
+	color: #636366;
+}
+.dark.container .blob-1 { opacity: 0.05; }
+.dark.container .blob-2 { opacity: 0.05; }
+.dark.container .blob-3 { opacity: 0.05; }
+.dark.container .task-card {
+	box-shadow: none;
+	background-color: #1C1C1E;
+	border: 1px solid rgba(255, 255, 255, 0.03);
 }
 </style>
 

@@ -6,6 +6,7 @@
     "versionCode" : "100",
     "transformPx" : false,
     "app-plus" : {
+        "darkmode" : true,
         "name" : "Clean Task",
         "appid" : "", // 安卓包名，格式如：com.cleantask.minimal（必须唯一）
         "versionName" : "1.0.0",
@@ -13,15 +14,22 @@
         "icon" : "static/logo.png", // 可先忽略，上架时再配logo
         "launchWebview" : {
             "transparentTitle" : "none",
-            "titleNView" : false
+            "titleNView" : false,
+            "safearea" : {
+                "bottom" : {
+                    "offset" : "none"
+                }
+            }
         },
         "android" : {
-            "package" : "com.cleantask.minimal", // 同上，安卓包名
-            "minSdkVersion" : "21", // 最低安卓版本，21兼容99%设备
-            "targetSdkVersion" : "33",
+            "package" : "com.cleantask.minimal",
+            "minSdkVersion" : "21",
+            "compatibleSdkVersion" : "34",
+            "targetSdkVersion" : "34",
             "usesPermissions" : [
                 "android.permission.WRITE_EXTERNAL_STORAGE",
-                "android.permission.READ_EXTERNAL_STORAGE"
+                "android.permission.READ_EXTERNAL_STORAGE",
+                "android.permission.EXPAND_STATUS_BAR"
             ]
         },
         "ios" : {

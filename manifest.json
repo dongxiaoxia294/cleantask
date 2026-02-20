@@ -15,11 +15,14 @@
         "launchWebview" : {
             "transparentTitle" : "none",
             "titleNView" : false,
+            "bounce" : "none",
+            "scrollIndicator" : "none",
             "safearea" : {
                 "bottom" : {
                     "offset" : "none"
                 }
-            }
+            },
+            "background" : "#F8FAFC"
         },
         "android" : {
             "package" : "com.cleantask.minimal",

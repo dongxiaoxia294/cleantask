@@ -178,9 +178,7 @@ export default {
 			}
 			
 			const isDark = this.theme === 'dark';
-			// 浅色模式使用渐变结束色，与页面背景融为一体
-			const navColor = isDark ? '#000000' : '#EFF6FF';
-			console.log('Setting navigation bar color:', navColor, 'isDark:', isDark);
+			console.log('Setting transparent navigation bar, isDark:', isDark);
 			
 			// 使用更可靠的方式调用 Android API
 			try {
@@ -200,50 +198,37 @@ export default {
 				
 				console.log('Got window successfully');
 				
-				// 设置导航栏颜色
+				// 设置透明导航栏，让 WebView 背景显示出来
 				try {
-					const Color = plus.android.importClass('android.graphics.Color');
-					const colorInt = Color.parseColor(navColor);
+					const WindowManager = plus.android.importClass('android.view.WindowManager');
 					
-					plus.android.invoke(window, 'setNavigationBarColor', colorInt);
-					console.log('Set navigation bar color to:', navColor);
-					
-					// 再次设置确保生效
-					setTimeout(() => {
-						try {
-							plus.android.invoke(window, 'setNavigationBarColor', colorInt);
-							console.log('Set navigation bar color again');
-						} catch (e) {
-							console.log('Second set failed:', e.message);
-						}
-					}, 100);
-				} catch (navErr) {
-					console.error('Setting nav color failed:', navErr.message);
-				}
-				
-				// 设置 Window flags
-				try {
 					// 清除 FLAG_TRANSLUCENT_NAVIGATION
 					plus.android.invoke(window, 'clearFlags', 134217728);
-					console.log('Cleared FLAG_TRANSLUCENT_NAVIGATION');
 					
 					// 添加 FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS
 					plus.android.invoke(window, 'addFlags', -2147483648);
-					console.log('Added FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS');
-				} catch (flagsErr) {
-					console.error('Setting flags failed:', flagsErr.message);
+					
+					// 设置导航栏为透明 - 关键！这样页面背景就能透过导航栏显示
+					const Color = plus.android.importClass('android.graphics.Color');
+					const transparentColor = Color.parseColor('#00000000'); // ARGB 透明
+					plus.android.invoke(window, 'setNavigationBarColor', transparentColor);
+					
+					console.log('Set transparent navigation bar');
+				} catch (navErr) {
+					console.error('Setting transparent nav failed:', navErr.message);
 				}
 				
-				// 设置按钮颜色
+				// 设置布局标志，让内容延伸到导航栏下方
 				try {
 					const decorView = plus.android.invoke(window, 'getDecorView');
 					if (decorView) {
 						const currentFlags = plus.android.invoke(decorView, 'getSystemUiVisibility');
 						
-						// SYSTEM_UI_FLAG_LAYOUT_STABLE = 256
-						let newFlags = currentFlags | 256;
+						// SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION = 512 - 让布局延伸到导航栏下方
+						// SYSTEM_UI_FLAG_LAYOUT_STABLE = 256 - 保持布局稳定
+						let newFlags = currentFlags | 512 | 256;
 						
-						// SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR = 16 (浅色模式下按钮变深色)
+						// SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR = 16 - 浅色模式下按钮变深色
 						if (!isDark) {
 							newFlags |= 16;
 						} else {
@@ -328,7 +313,8 @@ export default {
 	top: 0;
 	left: 0;
 	width: 100%;
-	height: 100%;
+	height: 100vh;
+	height: 100dvh; /* 使用动态视口高度，包含导航栏 */
 	overflow: hidden;
 	background: linear-gradient(to bottom, var(--background-gradient-start), var(--background-gradient-end));
 }
